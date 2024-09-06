@@ -60,7 +60,6 @@ export default function StarRating({ max = 5, color="#fcc419", size=48, classNam
     );
 }
 
-
 function Star({ onClick, full, onEnter, onLeave, color, size }) {
 	const starStyle = {
 		width: `${size}px`,
