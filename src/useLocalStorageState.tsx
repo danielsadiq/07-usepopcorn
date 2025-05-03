@@ -11,16 +11,3 @@ export function useLocalStorageState(key:string, initialItems:[] = []): [Watched
     }, [value])
     return [value, setValue]
 }
-
-
-
-// export function useLocalStorageState(initialState:[], key:string) {
-//   const [value, setWatched] = useState<WatchedMovieType[]>(function(){
-//       const storedValue = localStorage.getItem(key)
-//       return storedValue ? JSON.parse(storedValue ?? '[]') : initialState;
-//     });
-//     useEffect(function(){
-//       localStorage.setItem(key, JSON.stringify(value))
-//     }, [key])
-//     return [value, setWatched]
-// }
