@@ -1,7 +1,6 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { useState, ReactNode, useEffect, useRef } from "react";
 import StarRating from "./StarRatingmine";
-import { API_KEY, useMovies } from "./useMovies";
 
 type WatchedMovieType = {
   imdbID: string;
@@ -13,26 +12,29 @@ type WatchedMovieType = {
   userRating: number;
   countRatingDecisions: number;
 };
-
-export type MovieType = {
+type MovieType = {
   imdbID: string;
   Title: string;
   Year: string;
   Poster: string;
 };
 
+const API_KEY = "83650d26";
+
 const average = (arr: number[]) =>
   arr.reduce((acc, cur, _, arr) => acc + cur / arr.length, 0);
 
 export default function App() {
-  const [query, setQuery] = useState("");
-  const [selectedId, setSelectedId] = useState("");
+  const [movies, setMovies] = useState<MovieType[]>([]);
   const [watched, setWatched] = useState<WatchedMovieType[]>(function(){
     const storedValue = localStorage.getItem("watched")
     return JSON.parse(storedValue ?? '[]');
   });
-
-  const {movies, isLoading, error} = useMovies(query, handleCloseMovie);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  // const query = "interstellar";
+  const [query, setQuery] = useState("");
+  const [selectedId, setSelectedId] = useState("");
 
   function handleSelectMovie(id: string) {
     setSelectedId((selectedId) => (id === selectedId ? "" : id));
@@ -55,7 +57,46 @@ export default function App() {
     localStorage.setItem("watched", JSON.stringify(watched))
   }, [watched])
 
-  
+  useEffect(() => {
+    const controller = new AbortController();
+    const { signal } = controller;
+    async function fetchMovies() {
+      try {
+        setIsLoading(true);
+        setError("");
+        const res = await fetch(
+          `http://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`,
+          { signal }
+        );
+        if (!res.ok)
+          throw new Error("Something went wrong with fetching the movie");
+        // After this error message, the remainder of the code is not executed.
+
+        const data = await res.json();
+        if (data.Response === "False") throw new Error("Movie not found");
+        setMovies(data.Search);
+        setError("");
+      } catch (error) {
+        if (error instanceof Error) {
+          if (error.name !== "AbortError") setError(error.message); // Now TypeScript knows 'error' has a 'message' property
+        } else {
+          setError("An unexpected error occurred."); // Handle cases where the thrown value isn't an Error
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    if (query.length < 3) {
+      setMovies([]);
+      setError("");
+      return;
+    }
+    handleCloseMovie();
+    fetchMovies();
+    return function () {
+      controller.abort();
+    };
+  }, [query]);
 
   return (
     <>
