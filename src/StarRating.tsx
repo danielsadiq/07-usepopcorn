@@ -1,7 +1,5 @@
-/* eslint-disable react/prop-types */
 /* eslint-disable react/react-in-jsx-scope */
 import { useState } from "react";
-import PropTypes from "prop-types";
 
 const containerStyle = {
   display: "flex",
@@ -13,14 +11,14 @@ const starContainerStyle = {
   display: "flex",
 };
 
-StarRating.propTypes = {
-  maxRating: PropTypes.number,
-  defaultRating: PropTypes.number,
-  color: PropTypes.string,
-  size: PropTypes.number,
-  messages: PropTypes.array,
-  className: PropTypes.string,
-  onSetRating: PropTypes.func,
+type StarRatingProps = {
+  maxRating: number;
+  defaultRating?: number;
+  color?: string;
+  size: number;
+  messages?: string[];
+  className?: string;
+  onSetRating?: (...args:number[]) => void;
 };
 
 export default function StarRating({
@@ -31,13 +29,13 @@ export default function StarRating({
   messages = [],
   defaultRating = 0,
   onSetRating,
-}) {
+}: StarRatingProps) {
   const [rating, setRating] = useState(defaultRating);
   const [tempRating, setTempRating] = useState(0);
 
-  function handleRating(rating) {
+  function handleRating(rating: number) {
     setRating(rating);
-    onSetRating(rating);
+    onSetRating?.(rating);
   }
 
   const textStyle = {
@@ -70,8 +68,15 @@ export default function StarRating({
     </div>
   );
 }
-
-function Star({ onRate, full, onHoverIn, onHoverOut, color, size }) {
+type StarProps = {
+  onRate: () => void;
+  full: boolean;
+  onHoverIn: () => void;
+  onHoverOut: () => void;
+  color: string;
+  size: number;
+};
+function Star({ onRate, full, onHoverIn, onHoverOut, color, size }: StarProps) {
   const starStyle = {
     width: `${size}px`,
     height: `${size}px`,

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/react-in-jsx-scope */
 import { useState, ReactNode, useEffect } from "react";
-import StarRating from "./StarRatingmine";
+import StarRating from "./StarRating";
 
 type WatchedMovieType = {
   imdbID: string;
